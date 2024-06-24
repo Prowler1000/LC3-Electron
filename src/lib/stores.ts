@@ -42,3 +42,6 @@ export const updateMainButton = writable(0);
  *  [1] - Reset Memory pointer to .orig
  */
 export const reloadOverride = writable([false, false]);
+
+// Boolean: Editor has finished loading
+export const editorLoaded = writable(false);
