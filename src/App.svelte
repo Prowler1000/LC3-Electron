@@ -1,47 +1,139 @@
 <script lang="ts">
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from '/vite.svg'
-  import Counter from './lib/Counter.svelte'
+  import "./app.css"
+  import EditorView from "./presentation/EditorView.svelte";
+  import Header from "./components/Header.svelte";
+  import { onMount } from 'svelte'
 </script>
 
 <main>
-  <div>
-    <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-      <img src={viteLogo} class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank" rel="noreferrer">
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
-  <h1>Vite + Svelte</h1>
-
-  <div class="card">
-    <Counter />
-  </div>
-
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank" rel="noreferrer">SvelteKit</a>, the official Svelte app framework powered by Vite!
-  </p>
-
-  <p class="read-the-docs">
-    Click on the Vite and Svelte logos to learn more
-  </p>
+  <Header />
+  <EditorView />
 </main>
 
 <style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
-  }
+  #content{
+        height: inherit;
+        width: inherit;
+        position: relative;
+    }
+
+    #help{
+        height: 70vh;
+        width: 65vw;
+        position: absolute;
+        z-index: 15;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        display: grid;
+        justify-items: center;
+        align-items: center;
+    }
+
+    #modal{
+        position: absolute;
+        z-index: 14;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100vw;
+        cursor: pointer;
+        background-color: rgba(0,0,0,0.2);
+    }
+
+    #help-inner{
+        position: relative;
+        height: 88%;
+        width: 85%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    #buttonSet{
+        z-index: 5;
+        position: absolute;
+        top: 2%;
+        right: 10%;
+        display: flex;
+    }
+
+    #buttonSet button span{
+        transform: scale(1.4);
+    }
+
+    #prevBtn, #nextBtn{
+        height: 3em;
+        width: 3em;
+        border-radius: 50%;
+        font-size: 30px;
+        display: grid;
+        justify-items: center;
+        align-items: center;
+        margin-left: 1em;
+        border-width: 3px;
+    }
+
+    #docContent{
+        z-index: 4;
+        height: 59vh;
+        width: 100%;
+        overflow-y: scroll;
+    }
+
+    .note{
+        height: max-content;
+        width: 100%;
+        text-align: right;
+        font-size: 10px;
+        margin-bottom: 3vh;
+        background: unset;
+        padding: unset;
+        border: unset;
+    }
+
+    @media (max-width: 1300px) {
+        #modal{
+            height: 170vh;
+        }
+
+        #docContent{
+            height: 80vh;
+        }
+        
+        #help{
+            height: 90vh;
+            width: 80vw;
+        }
+    }
+
+    @media (max-width: 1000px) {
+        #buttonSet button span{
+            transform: scale(1.3);
+        }
+
+        #prevBtn, #nextBtn{
+            height: 2em;
+            width: 2em;
+            border-width: 2px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        #buttonSet{
+            top: -5%;
+            left: 50%;
+            transform: translateX(-45%);
+        }
+
+        #buttonSet button span{
+            transform: scale(1);
+        }
+
+        #prevBtn, #nextBtn{
+            height: 1.6em;
+            width: 1.6em;
+            margin: 0.2em;
+        }
+    }
 </style>
