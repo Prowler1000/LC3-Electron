@@ -2,6 +2,8 @@ const { log } = require("console");
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
 
+app.commandLine.appendSwitch("enable-features", "SharedArrayBuffer");
+
 const isDevEnvironment = process.env.DEV_ENV === "true";
 
 // enable live reload for electron in dev mode
@@ -20,7 +22,8 @@ const createWindow = () => {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(__dirname, "preload.cjs"),
+      nodeIntegrationInWorker: true,
     },
   });
 
