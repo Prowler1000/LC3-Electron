@@ -4,8 +4,8 @@
 -->
 
 <script>
-    import EditorView from '../Views/Editor.svelte';
-    //import SimulatorView from "./SimulatorView.svelte";
+    import EditorView from '../views/Editor.svelte';
+    import SimulatorView from '../views/Simulator.svelte';
     import { currentView } from '../lib/stores'
 
     let currView = "editor"
@@ -20,8 +20,8 @@
     <div id="workspace-inner">
         {#if currView == "editor"}
             <EditorView />
-        <!-- {:else}
-            <SimulatorView /> -->
+        {:else}
+            <SimulatorView />
         {/if}
     </div>
 </div>

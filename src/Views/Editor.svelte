@@ -10,9 +10,9 @@
 	import SimulatorStatus from "../components/editor/SimulatorStatus.svelte";
 	import { onMount } from 'svelte'
 	import { openedFile, currentView, assembledFile } from "../lib/stores"
-	//import Assembler from "../logic/assembler/assembler"
+	import Assembler from "../logic/assembler/lc3/assembler";
 	//import ARMAssembler from "../logic/assembler/armAssembler"
-	//import Simulator from "../logic/simulator/simulator";
+	import Simulator from "../logic/simulator/simulator";
 	
 	const LC3_EXTENSION = "asm"
 	const ARM_EXTENSION = "s"
@@ -174,6 +174,7 @@
 
 <div id="editor-view" role="group" aria-label="Editor workspace">
 	<!-- Initially hide Editor contents while application loads -->
+	{#if appLoadComplete}
 	<section id="ev-right">
 		<div class="filler">filler</div>
 		<div id="console-ctr" role="grid" aria-label="Console output to show assembly errors and success" tabindex="0">
@@ -181,18 +182,20 @@
 		</div>
 		<div id="ev-buttons">
 			<div id="ss-ctr"><SimulatorStatus /></div>
-			<button id="assemble" class="functionBtn" aria-label="Assemble the program" tabindex="0">
+			<button id="assemble" class="functionBtn" on:click={assembleClick} aria-label="Assemble the program" tabindex="0">
 				<span class="material-symbols-outlined">memory</span>
 				ASSEMBLE
 			</button>
-			<button class="switchBtn" tabindex="0">
+			<button class="switchBtn" on:click={toSimulator} tabindex="0">
 				Switch to Simulator
 			</button>
 		</div>
 
 	</section>
+	{/if}
 	<section id="ev-left">
-		<div id="filename" class="workSans" role="button" aria-label="Click to rename workspace file" tabindex="0">
+		<div id="filename" class="workSans" on:mouseenter={showRename} on:mouseleave={showFilename} on:click={setFilename} on:keypress={setFilename} role="button" aria-label="Click to rename workspace file" tabindex="0">
+			{showText}
 		</div>
 		<Editor />
 	</section>

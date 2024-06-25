@@ -17,7 +17,7 @@
     <div id="header-inner" role="group" aria-labelledby="header">
         {#if editorReady}
             <Title subtitle="Read the {currView} guide" />
-            <Menu />
+            <Menu {currView} />
             <ThemeToggle />
         {:else}
             <Title />
