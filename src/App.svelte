@@ -1,13 +1,12 @@
 <script lang="ts">
   import "./app.css"
-  import EditorView from "./presentation/EditorView.svelte";
+  import Workspace from "./presentation/Workspace.svelte";
   import Header from "./components/Header.svelte";
-  import { onMount } from 'svelte'
 </script>
 
 <main>
   <Header />
-  <EditorView />
+  <Workspace />
 </main>
 
 <style>
