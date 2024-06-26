@@ -163,7 +163,7 @@ export async function InitMonacoEditor() {
       }
 
       editor = Monaco.editor.create(document.getElementById('container'), {
-        theme: 'lceTheme',
+        theme: 'lc3Theme',
         value: getCode(),
         language: 'lc3Asm',
       })
