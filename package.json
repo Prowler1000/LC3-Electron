@@ -1,5 +1,9 @@
 {
   "name": "lc3-electron",
+  "description": "LC-3 Emulator built with Electron and Vite",
+  "author": {
+    "name": "Braeden Clarke"
+  },
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,17 +12,31 @@
     "dev": "concurrently --kill-others \"vite\" \"npm run electron\"",
     "electron": "cross-env DEV_ENV=true electron . --remote-debugging-port=9223",
     "vite": "vite",
-    "build": "vite build",
+    "vite:build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json",
+    "package": "electron-forge package",
+    "make": "npm run vite:build && electron-forge make",
+    "start": "npm run vite:build && electron-forge start"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.4.0",
+    "@electron-forge/maker-deb": "^7.4.0",
+    "@electron-forge/maker-rpm": "^7.4.0",
+    "@electron-forge/maker-squirrel": "^7.4.0",
+    "@electron-forge/maker-zip": "^7.4.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
+    "@electron-forge/plugin-fuses": "^7.4.0",
+    "@electron-forge/plugin-vite": "^7.4.0",
+    "@electron/fuses": "^1.8.0",
     "@stylistic/eslint-plugin": "^2.3.0",
     "@sveltejs/vite-plugin-svelte": "^3.1.1",
     "@tsconfig/svelte": "^5.0.4",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
+    "electron": "^31.1.0",
     "electron-reload": "^2.0.0-alpha.1",
+    "electron-winstaller": "^5.3.1",
     "module-alias": "^2.2.3",
     "svelte": "^4.2.18",
     "svelte-check": "^3.8.1",
@@ -27,7 +45,7 @@
     "vite": "^5.3.1"
   },
   "dependencies": {
-    "electron": "^31.0.2",
+    "electron-squirrel-startup": "^1.0.1",
     "monaco-editor": "^0.50.0",
     "resize-observer": "^1.0.4"
   }

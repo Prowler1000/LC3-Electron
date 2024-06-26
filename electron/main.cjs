@@ -1,50 +1,68 @@
-const { log } = require("console");
-const { app, BrowserWindow } = require("electron");
-const path = require("path");
+// Modules to control application life and create native browser window
+const { log } = require('console')
+const { app, BrowserWindow } = require('electron')
+const path = require('path')
+
+if (require('electron-squirrel-startup')) app.quit();
 
 app.commandLine.appendSwitch("enable-features", "SharedArrayBuffer");
 
-const isDevEnvironment = process.env.DEV_ENV === "true";
+
+const isDevEnvironment = process.env.DEV_ENV === 'true'
 
 // enable live reload for electron in dev mode
 if (isDevEnvironment) {
-  require("electron-reload")(__dirname, {
-    electron: path.join(__dirname, "..", "node_modules", ".bin", "electron"),
-    hardResetMethod: "exit",
-  });
+    require('electron-reload')(__dirname, {
+        electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron'),
+        hardResetMethod: 'exit'
+    });
 }
 
 let mainWindow;
 
 const createWindow = () => {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, "preload.cjs"),
-      nodeIntegrationInWorker: true,
-    },
-  });
+    
+    // Create the browser window.
+    mainWindow = new BrowserWindow({
+        width: 1300,
+        height: 600,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.cjs')
+        }
+    })
 
-  // define how electron will load the app
-  if (isDevEnvironment) {
-    mainWindow.loadURL("http://localhost:5173/");
+    // define how electron will load the app
+    if (isDevEnvironment) {
 
-    log("Electron running in dev mode: 🧪");
-  } else {
-    // when not in dev mode, load the build file instead
-    mainWindow.loadFile(path.join(__dirname, "build", "index.html"));
+        // if your vite app is running on a different port, change it here
+        mainWindow.loadURL('http://localhost:5173/');
 
-    log("Electron running in prod mode: 🚀");
-  }
-};
+        // Open the DevTools.
+        mainWindow.webContents.on("did-frame-finish-load", () => {
+            mainWindow.webContents.openDevTools();
+        });
 
-app.on("ready", createWindow);
+        log('Electron running in dev mode: 🧪')
 
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
-});
+    } else {
+        
+        // when not in dev mode, load the build file instead
+        mainWindow.loadFile(path.join(__dirname, '../dist', 'index.html'));
+
+        log('Electron running in prod mode: 🚀')
+    }
+}
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app.on('ready', createWindow);
+
+app.on('activate', () => {
+    // On macOS it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+})
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
