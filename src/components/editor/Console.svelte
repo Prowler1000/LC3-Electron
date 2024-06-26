@@ -12,7 +12,7 @@
 
     // Clear Console text content
     function clearConsole(event){
-        UI.clearConsole()
+        ui.clearConsole()
         // Avoid deselection if this component is interacted with
         event.stopImmediatePropagation()
     }
