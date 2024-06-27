@@ -16,6 +16,9 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "sourceMap": true,
+    "paths": {
+      "@/*": ["./src/*"],
+    },
   },
   "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "global.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }],
