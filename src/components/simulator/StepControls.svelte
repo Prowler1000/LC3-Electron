@@ -4,7 +4,7 @@
 -->
 
 <script>
-    import { updateMainButton } from '../../lib/stores';
+    import { updateMainButton } from '@/lib/stores';
     import { createEventDispatcher } from 'svelte'
     const dispatch = createEventDispatcher()
 

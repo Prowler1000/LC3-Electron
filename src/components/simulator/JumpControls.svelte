@@ -4,7 +4,7 @@
 -->
 
 <script>
-    import { currentView } from '../../lib/stores';
+    import { currentView } from '@/lib/stores';
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
 

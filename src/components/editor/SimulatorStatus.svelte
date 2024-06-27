@@ -4,7 +4,7 @@
 -->
 
 <script>
-    import { activeStoplight, assembledFile } from "../../lib/stores"
+    import { activeStoplight, assembledFile } from "@/lib/stores"
     import { onMount } from "svelte"
 
     // Active stoplight ID

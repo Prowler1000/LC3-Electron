@@ -1,13 +1,13 @@
 <script>
     import { onMount } from 'svelte';
-    import Register from '../components/simulator/Register.svelte';
-    import Memory from '../components/simulator/Memory.svelte';
-    import Console from '../components/editor/Console.svelte';
-    import StepControls from '../components/simulator/StepControls.svelte';
-    import JumpControls from '../components/simulator/JumpControls.svelte';
-    import SimulatorStatus from '../components/editor/SimulatorStatus.svelte';
-    import ui from '../lib/ui';
-    import { reloadOverride, UIReady, updateMainButton } from '../lib/stores';
+    import Register from '@/components/simulator/Register.svelte';
+    import Memory from '@/components/simulator/Memory.svelte';
+    import Console from '@/components/editor/Console.svelte';
+    import StepControls from '@/components/simulator/StepControls.svelte';
+    import JumpControls from '@/components/simulator/JumpControls.svelte';
+    import SimulatorStatus from '@/components/editor/SimulatorStatus.svelte';
+    import ui from '@/lib/ui';
+    import { reloadOverride, UIReady, updateMainButton } from '@/lib/stores';
     
 	// Preset data
 	let orig = 0

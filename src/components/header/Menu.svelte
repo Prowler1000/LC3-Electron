@@ -1,6 +1,6 @@
 <script>
     import { onMount } from "svelte"
-    import { openedFile, reloadOverride, latestSnapshot } from '../../lib/stores'
+    import { openedFile, reloadOverride, latestSnapshot } from '@/lib/stores'
     
     export let currView = "editor"
 

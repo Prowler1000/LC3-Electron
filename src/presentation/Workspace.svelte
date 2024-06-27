@@ -4,9 +4,9 @@
 -->
 
 <script>
-    import EditorView from '../views/Editor.svelte';
-    import SimulatorView from '../views/Simulator.svelte';
-    import { currentView } from '../lib/stores'
+    import EditorView from '@/views/Editor.svelte';
+    import SimulatorView from '@/views/Simulator.svelte';
+    import { currentView } from '@/lib/stores'
 
     let currView = "editor"
 

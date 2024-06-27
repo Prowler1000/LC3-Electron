@@ -4,7 +4,7 @@
 -->
 
 <script>
-    import ui from "../../lib/ui";
+    import ui from "@/lib/ui";
     import { onMount } from "svelte"
 
     let appLoadComplete = false

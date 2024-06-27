@@ -7,7 +7,7 @@
  */
 
 import type ErrorBuilder from "./errorBuilder";
-import ui from "../../../lib/ui";
+import ui from "@/lib/ui";
 
 export default class Parser {
   // instruction mnemonics mapped to opcodes

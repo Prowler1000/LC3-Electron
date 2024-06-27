@@ -5,7 +5,7 @@
 
 <script>
     import { onMount } from 'svelte';
-    import { reloadOverride } from '../../lib/stores';
+    import { reloadOverride } from '@/lib/stores';
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher()
 

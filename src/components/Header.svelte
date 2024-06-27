@@ -2,7 +2,7 @@
     import Menu from "./header/Menu.svelte";
     import Title from "./header/Title.svelte";
     import ThemeToggle from "./header/ThemeToggle.svelte";
-    import { currentView, editorLoaded } from "../lib/stores";
+    import { currentView, editorLoaded } from "@/lib/stores";
     import { onMount } from "svelte";
 
     // Set view-specific interface and controls

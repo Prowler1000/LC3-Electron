@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte'
     import { ResizeObserver } from 'resize-observer'
-    import { InitMonacoEditor } from "../../lib/editor";
-    import { latestSnapshot, editorLoaded } from '../../lib/stores';
+    import { InitMonacoEditor } from "@/lib/editor";
+    import { latestSnapshot, editorLoaded } from '@/lib/stores';
 
     onMount(async () => {
         if (!globalThis.editor) {

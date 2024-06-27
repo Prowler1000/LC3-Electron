@@ -5,7 +5,7 @@
 
 <script>
     import ThemeIcon from "./ThemeIcon.svelte";
-    import { darkMode } from "../../lib/stores"
+    import { darkMode } from "@/lib/stores"
     import { onMount } from "svelte"
 
     // Set mode variables

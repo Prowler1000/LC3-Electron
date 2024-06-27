@@ -3,20 +3,9 @@ const { log } = require('console')
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
 
-if (require('electron-squirrel-startup')) app.quit();
-
 app.commandLine.appendSwitch("enable-features", "SharedArrayBuffer");
 
-
 const isDevEnvironment = process.env.DEV_ENV === 'true'
-
-// enable live reload for electron in dev mode
-if (isDevEnvironment) {
-    require('electron-reload')(__dirname, {
-        electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron'),
-        hardResetMethod: 'exit'
-    });
-}
 
 let mainWindow;
 
@@ -48,8 +37,6 @@ const createWindow = () => {
         
         // when not in dev mode, load the build file instead
         mainWindow.loadFile(path.join(__dirname, '../dist', 'index.html'));
-
-        log('Electron running in prod mode: 🚀')
     }
 }
 

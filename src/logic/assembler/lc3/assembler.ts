@@ -10,7 +10,7 @@
 
 import Parser from "./parser";
 import ErrorBuilder from "./errorBuilder";
-import ui from "../../../lib/ui";
+import ui from "@/lib/ui";
 
 export default class Assembler {
   // all valid opcodes, including trap aliases

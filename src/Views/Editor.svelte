@@ -5,14 +5,14 @@
 -->
 
 <script>
-	import Editor from "../components/editor/Editor.svelte";
-	import Console from "../components/editor/Console.svelte";
-	import SimulatorStatus from "../components/editor/SimulatorStatus.svelte";
-	import { onMount } from 'svelte'
-	import { openedFile, currentView, assembledFile } from "../lib/stores"
-	import Assembler from "../logic/assembler/lc3/assembler";
+	import Editor from "@/components/editor/Editor.svelte";
+	import Console from "@/components/editor/Console.svelte";
+	import SimulatorStatus from "@/components/editor/SimulatorStatus.svelte";
+	import { openedFile, currentView, assembledFile } from "@/lib/stores"
+	import Assembler from "@/logic/assembler/lc3/assembler";
 	//import ARMAssembler from "../logic/assembler/armAssembler"
-	import Simulator from "../logic/simulator/simulator";
+	import Simulator from "@/logic/simulator/simulator";
+	import { onMount } from 'svelte'
 	
 	const LC3_EXTENSION = "asm"
 	const ARM_EXTENSION = "s"

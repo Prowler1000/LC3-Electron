@@ -4,7 +4,7 @@
 -->
 
 <script>
-    import { toggleHelp } from "../../lib/stores";
+    import { toggleHelp } from "@/lib/stores";
 
     export let subtitle = `Source code on <a href="https://github.com/aidan-garvey/WebLC3">Github</a>`
 

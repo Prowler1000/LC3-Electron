@@ -8,12 +8,7 @@
  *      - StepControls.svelte
  */
 
-import {
-  activeStoplight,
-  consoleSelected,
-  UIReady,
-  updateMainButton,
-} from "./stores";
+import { activeStoplight, consoleSelected, UIReady, updateMainButton } from "./stores";
 
 
 // Signal that UI is ready to update

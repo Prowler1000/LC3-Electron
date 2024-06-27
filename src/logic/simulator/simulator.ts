@@ -7,15 +7,15 @@
  * the worker will appear to the simulator.
  */
 
-import Assembler from "../assembler/lc3/assembler";
-//import ARMAssembler from "../assembler/armAssembler";
-import ui from "../../lib/ui";
+import Assembler from "@logic/assembler/lc3/assembler";
+//import ARMAssembler from "@logic/assembler/armAssembler";
+import ui from "@/lib/ui";
 import Messages from "./simMessages";
 import { AsciiDecoder } from "./decoders";
 import LC3Worker from "./lc3SimWorker?worker";
 //import ARMWorker from "$lib/armSimWorker?worker";
 
-import LC3OS from '../../../public/os/lc3_os.asm?asset'
+import LC3OS from '/os/lc3_os.asm?asset'
 
 // Used to tell which type of simulator worker to create
 enum FileType {
