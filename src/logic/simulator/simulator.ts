@@ -15,6 +15,8 @@ import { AsciiDecoder } from "./decoders";
 import LC3Worker from "./lc3SimWorker?worker";
 //import ARMWorker from "$lib/armSimWorker?worker";
 
+import LC3OS from '../../../public/os/lc3_os.asm?asset'
+
 // Used to tell which type of simulator worker to create
 enum FileType {
     LC3 = "asm",
@@ -138,7 +140,7 @@ export default class Simulator
         }
         else
         {
-            const res = await fetch('/os/lc3_os.asm?raw');
+            const res = await fetch(LC3OS);
             const src = await res.text();
             asmResult = await Assembler.assemble(src, false);
         }

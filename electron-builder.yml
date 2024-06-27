@@ -1,0 +1,22 @@
+appId: com.lc3-electron
+productName: lc3-electron
+directories:
+  output: ".out"
+files:
+  - '!**/*'
+  - 'electron'
+  - 'dist'
+  - 'node_modules'
+win:
+  executableName: lc3-electron
+nsis:
+  artifactName: ${name}-${version}-setup.${ext}
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: always
+appImage:
+  artifactName: ${name}-${version}.${ext}
+npmRebuild: false
+publish:
+  provider: generic
+  url: https://example.com/auto-updates

@@ -9,12 +9,17 @@
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
-    "electron": "cross-env DEV_ENV=true electron . --remote-debugging-port=9223",
-    "vite": "vite",
-    "vite:build": "vite build",
-    "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json",
     "dev":            "concurrently --kill-others \"vite\" \"pnpm electron\"",
+    "electron":       "cross-env DEV_ENV=true electron . --remote-debugging-port=9223",
+    "vite":           "vite",
+    "vite:build":     "vite build",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json",
+    "svelte-check":   "svelte-check --tsconfig ./tsconfig.json",
+    "typecheck":      "pnpm typecheck:node && pnpm svelte-check",
+    "build":          "pnpm typecheck && pnpm vite:build",
+    "build:win":      "pnpm build && electron-builder build --win",
+    "build:mac":      "pnpm build && electron-builder build --mac",
+    "build:linux":    "pnpm build && electron-builder build --linux"
   },
   "devDependencies": {
     "@electron/fuses": "^1.8.0",
