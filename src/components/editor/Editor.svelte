@@ -5,7 +5,6 @@
     import { latestSnapshot, editorLoaded } from '../../lib/stores';
 
     onMount(async () => {
-        let monaco;
         if (!globalThis.editor) {
             await InitMonacoEditor();
         }
@@ -13,17 +12,11 @@
             let content = globalThis.editor.getValue();
             latestSnapshot.set(content)
         }
-        if (globalThis.monacoContainer == undefined) {
-            monaco = document.getElementById("container");
-            globalThis.monacoContainer = monaco
-        }
-        else {
-            monaco = globalThis.monacoContainer
-        }
+
         let editor = document.getElementById("editorCtr");
         if (editor) {
             editor.innerHTML = "";
-            //let monaco = document.getElementById("container");
+            let monaco = globalThis.editor.getContainerDomNode();
             editor.appendChild(monaco);
             let ro = new ResizeObserver(() => { resize() });
             ro.observe(editor);
