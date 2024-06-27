@@ -148,6 +148,10 @@
 			if(obj){
 				// Create globally-available Simulator class
 				let map = obj.pop()
+				// Clean up existing simulator. "Temporary" fix :)
+				if (globalThis.simulator) {
+					globalThis.simulator.destroy();
+				}
 				globalThis.simulator = new Simulator(obj[0], map, getExtension())
 				globalThis.lastPtr = null
 				globalThis.lastBps = null

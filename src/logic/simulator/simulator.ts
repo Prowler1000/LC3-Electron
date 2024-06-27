@@ -195,6 +195,13 @@ export default class Simulator
     }
 
     /**
+     * Terminate the simWorker and clean up as required
+     */
+    public destroy() {
+        this.simWorker.terminate();
+    }
+
+    /**
      * Load code into memory, set PC to start of program, restore Processor
      * Status Register to defaults, set clock-enable
      */
