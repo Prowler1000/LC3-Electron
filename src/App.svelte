@@ -10,7 +10,7 @@
 </main>
 
 <style>
-  #content{
+    #content{
         height: inherit;
         width: inherit;
         position: relative;

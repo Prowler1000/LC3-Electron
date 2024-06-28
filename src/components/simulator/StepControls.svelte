@@ -3,13 +3,13 @@
         Trigger Run, Step in, Step out, or Step over controls
 -->
 
-<script>
+<script lang="ts">
     import { updateMainButton } from '@/lib/stores';
     import { createEventDispatcher } from 'svelte'
     const dispatch = createEventDispatcher()
 
     // Dispatch clicked control
-    function step(control){
+    function step(control: string){
         dispatch("step", { text: control })
     }
 

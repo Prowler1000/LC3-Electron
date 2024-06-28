@@ -3,7 +3,7 @@
         Reflect current state of Simulator class. Includes 3 stoplights: NOT READY, READY, and RUNNING
 -->
 
-<script>
+<script lang="ts">
     import { activeStoplight, assembledFile } from "@/lib/stores"
     import { onMount } from "svelte"
 
@@ -25,7 +25,7 @@
                 let currActive = document.querySelector(".stoplight-active")
                 if(currActive)
                     currActive.classList.remove("stoplight-active")
-                stoplight.classList.add("stoplight-active")
+                stoplight?.classList.add("stoplight-active")
             }, 300)
         });
 
@@ -83,7 +83,7 @@
         }
     }
 
-    let download = (fileName, data) => {}
+    let download = (fileName: string, data: Blob) => {}
 </script>
 
 <div id="sim-status" role="status" aria-label="Check machine status and available assembled files to download" aria-live="polite">

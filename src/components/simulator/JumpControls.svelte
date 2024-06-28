@@ -3,13 +3,13 @@
         Return new memory range; Refreshes Memory simulator UI component
 -->
 
-<script>
+<script lang="ts">
     import { currentView } from '@/lib/stores';
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
 
     // Dispatch clicked control
-    function jump(control){ dispatch("jump", { text: control }) }
+    function jump(control: string | number){ dispatch("jump", { text: control }) }
 
     // Switch to Editor button click
     function toEditor() {
@@ -22,29 +22,29 @@
     function jumpBackwardClick(){ jump("jb") }
     function jumpForwardClick(){ jump("jf") }
     function longJumpForwardClick(){ jump("ljf") }
-    function enterMemory(event){
+    function enterMemory(event: KeyboardEvent){
         if(event.key == "Enter"){
-            let input = document.getElementById("jump-input").value
+            let input = (document.getElementById("jump-input") as HTMLInputElement).value
             // Remove '0x' or 'x' prefix
             let loc = input.split('x').pop()
 
             // Only jump if memory location exists
-            if(isHex(loc)) 
+            if(loc && isHex(loc)) 
                 jump(parseInt(loc, 16))
         }
     }
     function jumpMemory(){
-        let jumpInput = document.getElementById("jump-input")
+        let jumpInput = document.getElementById("jump-input") as HTMLInputElement
         let input = jumpInput.value
         if(input == "")
             input = jumpInput.placeholder
         let loc = input.split('x').pop()
-        if(isHex(loc)) 
+        if(loc && isHex(loc)) 
             jump(parseInt(loc, 16))
     }
 
     // Validate hex value
-    function isHex(val) {
+    function isHex(val: string) {
         let num = parseInt(val,16)
         let valid = (num.toString(16) === val.toLowerCase())
         let inRange = (num >= 0 && num <= 65535)

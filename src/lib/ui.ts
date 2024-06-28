@@ -17,14 +17,14 @@ function update(){
 }
 
 // Replace all contents of Console with given string
-function printConsole(msg){
+function printConsole(msg: string){
     if(msg)
         modifyConsole(msg)
 }
 
 
 // Append to Console with given string
-function appendConsole(msg){
+function appendConsole(msg: string){
     if(msg)
         modifyConsole(msg, true)
 }
@@ -40,7 +40,7 @@ function clearConsole(){
 function selectConsole(){
     try{
         let theConsole = document.getElementById("c-ctr")
-        theConsole.classList.add("console-highlighted")
+        theConsole?.classList.add("console-highlighted")
         consoleSelected.set(true)
     } catch {}
 }
@@ -50,7 +50,7 @@ function selectConsole(){
 function deselectConsole(){
     try{
         let theConsole = document.getElementById("c-ctr")
-        theConsole.classList.remove("console-highlighted")
+        theConsole?.classList.remove("console-highlighted")
         consoleSelected.set(false)
     } catch {}
 }
@@ -62,7 +62,7 @@ function deselectConsole(){
  *      append - Boolean: Append string to Console
  *      clear - Boolean: Clear Console
  */
-function modifyConsole(msg, append=false, clear=false){
+function modifyConsole(msg: string, append=false, clear=false){
     let consoleInner = document.getElementById("console-inner")
     if(consoleInner){
 

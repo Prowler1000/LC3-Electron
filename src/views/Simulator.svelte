@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { onMount } from 'svelte';
     import Register from '@/components/simulator/Register.svelte';
     import Memory from '@/components/simulator/Memory.svelte';
@@ -13,8 +13,8 @@
 	let orig = 0
 	$: pc = 512
 	$: currPtr = -1
-	$: memMap = []
-	$: regMap = []
+	$: memMap = [] as string[][]
+	$: regMap = [] as (string | number)[][]
 	let shortJumpOffset = 5
 	let longJumpOffset = 23
 	let numRegisters = 8
@@ -116,13 +116,13 @@
 	/* DISPATCH AND EVENT HANDLERS */
 
 	// Update PC
-	function newPC(event){
+	function newPC(event: CustomEvent<any>){
 		pc = event.detail.text
 		updateRegisters()
 	}
 
 	// "Light up" a component or table row
-	function lightUpComponent(event){
+	function lightUpComponent(event: CustomEvent<any>){
 		let compo = document.getElementById(event.detail.text)
 		if(compo){
 			compo.classList.add("lightup")
@@ -133,7 +133,7 @@
 	}
 
 	// Execute Step controls
-	async function step(event){
+	async function step(event: CustomEvent<any>){
 		if(globalThis.simulator){
 			let control = event.detail.text
 			if(control == "in"){ await globalThis.simulator.stepIn() }
@@ -154,7 +154,7 @@
 	}
 
 	// Execute Jump controls
-	function jump(event){
+	function jump(event: CustomEvent<any>){
 		if(globalThis.simulator){
 			let control = event.detail.text
 
@@ -198,8 +198,8 @@
 	}
 
 	// Select Console on click
-	function focusConsole(event){
-		UI.selectConsole()
+	function focusConsole(event: Event){
+		ui.selectConsole()
 		event.stopImmediatePropagation()
 	}
 

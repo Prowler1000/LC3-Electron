@@ -162,7 +162,11 @@ export async function InitMonacoEditor() {
           ].join('\n');
       }
 
-      editor = Monaco.editor.create(document.getElementById('container'), {
+      let container = document.getElementById('container');
+      if (!container) {
+        throw Error("Fatal error: Couldn't find element \"container\" when initializing editor")
+      }
+      editor = Monaco.editor.create(container, {
         theme: 'lc3Theme',
         value: getCode(),
         language: 'lc3Asm',

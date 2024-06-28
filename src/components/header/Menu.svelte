@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { onMount } from "svelte"
     import { openedFile, reloadOverride, latestSnapshot } from '@/lib/stores'
     
@@ -12,7 +12,7 @@
     /* EDITOR MENU CONTROLS */
 
     // Meta click handler
-    function click() {
+    function click(this: { id: string; class: string; "on:click": () => void; role: "menuitem"; "aria-label": string; }) {
         if (!readOnly) {
             let type = this.id;
             switch (type) {
@@ -54,24 +54,26 @@
     }// Open: Open an existing .asm file and load content to Editor
     function openClick(){
         let opener = document.getElementById("opener")
-        opener.click()
+        opener?.click()
     }
     function openFile(){
-        let files = document.getElementById("opener").files
-        if (files.length > 0) {
+        let files = (document.getElementById("opener") as HTMLInputElement).files
+        if (files && files.length > 0) {
             let filename = files[0].name
             let extension = filename.split('.').pop();
-            extension = extension.split('.').pop();
+            extension = extension?.split('.').pop();
             if(extension == "asm" || extension == "s"){
                 const reader = new FileReader()
                 reader.readAsText(files[0]);
                 reader.onload = function() {
                     let editor = globalThis.editor
                     if(editor){
-                        let result = reader.result.toString()
-                        editor.setValue(result)
-                        updateFilename(filename)
-                        latestSnapshot.set(result)
+                        let result = reader.result?.toString()
+                        if (result){
+                            editor.setValue(result)
+                            updateFilename(filename)
+                            latestSnapshot.set(result)
+                        }
                     }
                     else
                         console.error("Reading file to editor failed.")
@@ -90,11 +92,11 @@
             download(filename,content)
         }
     }
-    let download = (fileName, data) => {}
+    let download = (fileName: string, data: string) => {}
 
     // Load download function on application load
     onMount(() => {
-        download = (fileName, data) => {
+        download = (fileName: string, data) => {
             var a = document.createElement("a")
             document.body.appendChild(a)
             var blob = new Blob([data], { type: "plain/text" })
@@ -106,7 +108,7 @@
         }
     });
     // Update filename reflected in EditorView
-    function updateFilename(fn) { openedFile.set(fn) }
+    function updateFilename(fn: string) { openedFile.set(fn) }
 
     /* SIMULATOR MENU CONTROLS */
 

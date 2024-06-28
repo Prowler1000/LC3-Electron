@@ -3,16 +3,16 @@
         WebLC3 title component
 -->
 
-<script>
+<script lang="ts">
     import { toggleHelp } from "@/lib/stores";
 
     export let subtitle = `Source code on <a href="https://github.com/aidan-garvey/WebLC3">Github</a>`
 
     // Aesthetic animation on hover
-    function addJiggle(){
+    function addJiggle(this: HTMLElement){
         this.classList.add("jiggle")
     }
-    function removeJiggle(){
+    function removeJiggle(this: HTMLElement){
         this.classList.remove("jiggle")
     }
 

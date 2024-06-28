@@ -3,20 +3,20 @@
         Reflect value stored and instruction mapped in CPU memory
 -->
 
-<script>
+<script lang="ts">
     import { onMount } from 'svelte';
     import { reloadOverride } from '@/lib/stores';
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher()
 
     // Dispatch updated PC
-    function updatePC(newPC) {
+    function updatePC(newPC: number) {
         dispatch("updatePC", { text: newPC })
     }
 
     // Dispatch component to light up
     let cancelFirstLightup = true
-    function lightUp(id){
+    function lightUp(id: string){
         if(!cancelFirstLightup)
             dispatch("lightUp", { text: id })
         else
@@ -35,8 +35,8 @@
     let currMap = map
     let currPC = pc
     // UI reference to data map and breakpoints
-    $: data = []
-    let breakpoints = []
+    $: data = [] as any[]
+    let breakpoints: number[] = []
     // Stifle other functions from firing if input is open
 	let inputOpen = false
 
@@ -83,7 +83,7 @@
         reloadMemRange(currPtr)
     }
     // Load memory range
-    function reloadMemRange(newPtr){
+    function reloadMemRange(newPtr: number){
         data = []
         for (let n=0; n<rows; n++){
             let finalDec = newPtr+n
@@ -113,9 +113,9 @@
     /* SET-UNSET INTERACTIONS */
 
     // Set or unset breakpoint on click
-    function setBreakpoint(){
+    function setBreakpoint(this: HTMLElement){
         let currClass = this.classList
-        let id = parseInt(this.id.split('-').pop())
+        let id = parseInt(this.id.split('-').pop() || "0")
         if(!currClass.contains("bp-selected")){
             this.classList.add("bp-selected")
             breakpoints.push(id)
@@ -132,8 +132,8 @@
     }
 
     // Set PC on click
-    function setPC(){
-        let pcInt = parseInt(this.id.split('-').pop())
+    function setPC(this: HTMLElement){
+        let pcInt = parseInt(this.id.split('-').pop() || "0")
         let thePC = document.querySelector(".ptr-selected")
         if(thePC)
             thePC.classList.remove("ptr-selected")
@@ -158,7 +158,7 @@
     /* VALUE OVERRIDE */
 
     // Set new memory value via hexadecimal
-    function editHex(){
+    function editHex(this: HTMLElement){
         if(!inputOpen){
             let currContent = this.innerHTML
             let newInput = createInputBox(currContent, false)
@@ -168,7 +168,7 @@
         }
     } 
     // Set new memory value via decimal
-    function editDec(){
+    function editDec(this: HTMLElement){
         if(!inputOpen){
             let currContent = this.innerHTML
             let newInput = createInputBox(currContent, true)
@@ -179,7 +179,7 @@
     } 
 
     // Append text input to cell
-    function createInputBox(content, dec=false){
+    function createInputBox(content: string, dec=false){
         let newInput = document.createElement("input")
         newInput.value = content
         newInput.ariaLabel = "Enter new value"
@@ -188,42 +188,44 @@
         newInput.addEventListener("blur", function leave(e) {
             inputOpen = false
             try {
-                let parent = e.target.parentElement
-                saveInput(parent, e.target.value)
-                parent.removeChild(e.target)
-                setTimeout(function() { parent.focus() }, 100);
+                let parent = (e.target as HTMLElement)?.parentElement
+                if (!parent) throw Error("Blur event target has no parent!");
+                saveInput(parent, (e.target as HTMLInputElement)?.value)
+                parent?.removeChild(e.target as HTMLElement)
+                setTimeout(function() { parent?.focus() }, 100);
             } catch {}
         })
         newInput.addEventListener("keydown", function leave(e) {
             if(e.key == "Enter"){
                 inputOpen = false
                 try {
-                    let parent = e.target.parentElement
-                    saveInput(parent, e.target.value)
-                    parent.removeChild(e.target)
+                    let parent = (e.target as HTMLElement)?.parentElement
+                    if (!parent) throw Error("Keydown event target (input box) has no parent!")
+                    saveInput(parent, (e.target as HTMLInputElement)?.value)
+                    parent?.removeChild(e.target as HTMLElement)
                 } catch {}
             }
             e.stopImmediatePropagation()
         })
 
         // Commit new value if validations pass. Else, rollback (old value will not change)
-        function saveInput(thisCell, newValue){
+        function saveInput(thisCell: HTMLElement, newValue: string){
             let valid = false
             if(dec)
                 valid = isDec(newValue)
             else{
                 // Remove '0x' or 'x' prefix
-                newValue = newValue.split('x').pop()
+                newValue = newValue.split('x').pop() || ""
                 valid = isHex(newValue)
             }
             
             if(valid && dec){
-                let rowNum = parseInt(thisCell.parentElement.id.split('-').pop())
+                let rowNum = parseInt(thisCell.parentElement?.id.split('-').pop() || "-1")
                 
                 // Commit to CPU memory
-                let address = parseInt(thisCell.id.split('-').pop())
+                let address = parseInt(thisCell.id.split('-').pop() || "-1")
                 if(globalThis.simulator) {
-                    globalThis.simulator.setMemory(address, newValue)
+                    globalThis.simulator.setMemory(address, parseInt(newValue))
                     let updatedVal = globalThis.simulator.getMemory(address)
                     // Update Hexadecimal cell
                     data[rowNum][2] = "0x" + updatedVal.toString(16)
@@ -234,10 +236,10 @@
                 }
             }
             else if(valid){
-                let rowNum = parseInt(thisCell.parentElement.id.split('-').pop())
+                let rowNum = parseInt(thisCell.parentElement?.id.split('-').pop() || "-1")
                 
                 // Commit to CPU memory
-                let address = parseInt(thisCell.id.split('-').pop())
+                let address = parseInt(thisCell.id.split('-').pop() || "-1")
                 if(globalThis.simulator) {
                     globalThis.simulator.setMemory(address, parseInt(newValue, 16))
                     let updatedVal = globalThis.simulator.getMemory(address)
@@ -255,14 +257,14 @@
     }
 
     // Validate hexadecimal input
-    function isHex(val) {
+    function isHex(val: string) {
         let num = parseInt(val,16);
         let valid = (num.toString(16) === val.toLowerCase())
         let inRange = (num >= 0 && num <= 65535)
         return valid && inRange
     }
     // Validate decimal input
-    function isDec(val) {
+    function isDec(val: string) {
         let num = parseInt(val)
         let valid = (num.toString() === val.toLowerCase())
         let inRange = (num >= -32768 && num <= 32767)
@@ -273,17 +275,23 @@
     /* FOCUS NAVIGATION */
 
     // Shift focus from table to cell with down arrow key
-    function focusCell(event){
+    function focusCell(this: HTMLElement, event: KeyboardEvent){
         if(event.key == "ArrowDown" && this == document.activeElement)
-            this.firstChild.firstChild.focus()
+            (this.firstChild?.firstChild as HTMLElement).focus()
     }
 
     // Shift focus across interactable cells with arrow keys
-    function focusArrowNavigate(event){
+    function focusArrowNavigate(this: HTMLElement, event: KeyboardEvent){
         if(event.key == "ArrowUp" || event.key == "ArrowDown" || event.key == "ArrowLeft" || event.key == "ArrowRight"){
-            let thisRow = parseInt(this.parentElement.id.split("-").pop())
-            let thisCol = Array.from(this.parentNode.children).indexOf(this)
+            if (!this.parentElement || !this.parentNode) {
+                throw Error("focusArrowNavigate has falsy parent element or node!")
+            }
+            let thisRow = parseInt(this.parentElement.id.split("-").pop() || "-1")
+            let thisCol = Array.from(this.parentNode.children).indexOf(this) 
             let table = this.parentElement.parentElement
+            if (!table) {
+                throw Error("focusArrowNavigate has falsy table value (seriously, how far up do we need to go?)")
+            }
             let nextRow = thisRow
             let nextCol = thisCol
 
@@ -308,8 +316,8 @@
                     nextCol = cols.length - 1
             }
             
-            let nextItem = table.children[nextRow]
-            nextItem.children[nextCol].focus()
+            let nextItem = table.children[nextRow];
+            (nextItem.children[nextCol] as HTMLElement).focus()
         }
     }
 </script>

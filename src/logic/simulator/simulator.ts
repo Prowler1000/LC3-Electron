@@ -15,6 +15,7 @@ import { AsciiDecoder } from "./decoders";
 import LC3Worker from "./lc3SimWorker?worker";
 //import ARMWorker from "$lib/armSimWorker?worker";
 
+// @ts-ignore
 import LC3OS from '/os/lc3_os.asm?asset'
 
 // Used to tell which type of simulator worker to create
@@ -77,11 +78,11 @@ export default class Simulator
     // memory addresses mapped to the code which generated the value there
     private userDisassembly: Map<number, string>;
     // object file for operating system code
-    private osObjFile: Uint16Array;
-    private osDissassembly: Map<number, string>;
+    private osObjFile!: Uint16Array;
+    private osDissassembly!: Map<number, string>;
 
     // worker thread for running the simulator without freezing rest of app
-    private simWorker: Worker;
+    private simWorker!: Worker;
     // worker is executing code for the simulator
     private workerBusy: boolean = false;
     // shared flag to halt worker
@@ -93,8 +94,13 @@ export default class Simulator
      * @param objectFile the object file to load
      * @param sourceCode memory addresses mapped to disassembled source code
      */
-    public constructor(objectFile: Uint16Array, sourceCode: Map<number, string>, type: FileType)
+    public constructor(objectFile: Uint16Array, sourceCode: Map<number, string>, ftype: FileType | "asm" | "s")
     {
+        let type: FileType;
+        if (ftype === "asm")
+            type = FileType.LC3
+        else
+            type = FileType.ARM
         this.userObjFile = objectFile;
         this.userDisassembly = sourceCode;
 
@@ -136,7 +142,7 @@ export default class Simulator
         {
             const res = await fetch('/os/lc3_arm_os.s?raw');
             const src = await res.text();
-            asmResult = await ARMAssembler.assemble(src, false);
+            asmResult = null //await ARMAssembler.assemble(src, false);
         }
         else
         {
@@ -160,8 +166,9 @@ export default class Simulator
      */
     private initWorker(type: FileType)
     {
-        if (type == FileType.ARM)
-            this.simWorker = new ARMWorker();
+        if (type == FileType.ARM) {
+            //this.simWorker = new ARMWorker();
+        }
         else
             this.simWorker = new LC3Worker();
 

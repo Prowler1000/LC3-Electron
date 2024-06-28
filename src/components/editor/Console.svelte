@@ -3,7 +3,7 @@
         Display Assembler and Simulator state messages, character output, and error messages
 -->
 
-<script>
+<script lang="ts">
     import ui from "@/lib/ui";
     import { onMount } from "svelte"
 
@@ -11,7 +11,7 @@
     onMount(() => { appLoadComplete = true });
 
     // Clear Console text content
-    function clearConsole(event){
+    function clearConsole(event: Event){
         ui.clearConsole()
         // Avoid deselection if this component is interacted with
         event.stopImmediatePropagation()

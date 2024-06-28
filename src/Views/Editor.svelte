@@ -4,7 +4,7 @@
 		assemble and generate .obj files for Simulator use, and view assembly status and errors through a Console
 -->
 
-<script>
+<script lang="ts">
 	import Editor from "@/components/editor/Editor.svelte";
 	import Console from "@/components/editor/Console.svelte";
 	import SimulatorStatus from "@/components/editor/SimulatorStatus.svelte";
@@ -20,7 +20,7 @@
 	let appLoadComplete = false
 	onMount(() => {
 		let filename = document.getElementById("filename")
-		filename.style.visibility = "visible"
+		if (filename) filename.style.visibility = "visible"
 		appLoadComplete = true
 	});
 
@@ -50,7 +50,7 @@
 	}
 
 	// Set new filename
-	function setFilename(){
+	function setFilename(this: HTMLElement){
 		if(!inputOpen){
 			showText = ""
 			let newInput = createInputBox()
@@ -75,10 +75,11 @@
 			showText = filename
 			inputOpen = false
 			try {
-				let parent = e.target.parentElement
-				saveInput(e.target.value)
-				parent.removeChild(e.target)
-				setTimeout(function() { parent.focus() }, 100);
+				let target = (e.target as HTMLInputElement)
+				let parent = target.parentElement
+				saveInput(target.value)
+				parent?.removeChild(target)
+				setTimeout(function() { parent?.focus() }, 100);
 			} catch {}
 		})
 		newInput.addEventListener("keydown", function leave(e) {
@@ -86,16 +87,17 @@
 				showText = filename
 				inputOpen = false
 				try {
-					let parent = e.target.parentElement
-					saveInput(e.target.value)
-					parent.removeChild(e.target)
+					let target = (e.target as HTMLInputElement)
+					let parent = target.parentElement
+					saveInput(target.value)
+					parent?.removeChild(target)
 				} catch {}
 			}
 			e.stopImmediatePropagation()
 		})
 
 		// Commit new filename if validations pass. Else, rollback (old value will not change)
-		function saveInput(newValue){
+		function saveInput(newValue: string){
 			if(newValue.length > 0){
 				newValue = newValue.replaceAll(" ","_")
 				// Make filename utf-8 encoding-friendly
@@ -124,9 +126,12 @@
 	}
 
 	// Returns the currently open file's extension
-	function getExtension() {
+	function getExtension(): "s" | "asm" {
 		let tokens = filename.split(".");
-		return tokens[tokens.length - 1]
+		let filetype = tokens[tokens.length - 1]
+		if (filetype !== "s" && filetype !== "asm")
+			throw Error("Unhandled exception. File extension does not match required extensions of \"s\" or \"asm\".")
+		return filetype
 	}
 
 	/* ASSEMBLY */
@@ -141,13 +146,19 @@
 			if (getExtension() === LC3_EXTENSION)
 				obj = await Assembler.assemble(sourceCode)
 			else if (getExtension() === ARM_EXTENSION)
-				obj = await ARMAssembler.assemble(sourceCode)
+				obj = null //await ARMAssembler.assemble(sourceCode)
 			else
 				alert(`File ${filename} could not be assembled due to invalid extension. WebLC3 only accepts .asm and .s files.`);
 
 			if(obj){
 				// Create globally-available Simulator class
 				let map = obj.pop()
+				if (!map) {
+					throw Error("Map not defined. Source code assembly failed.")
+				}
+				if (map instanceof Uint16Array) {
+					throw Error("Trying to pass Uint16Array to simulator as source code.")
+				}
 				// Clean up existing simulator. "Temporary" fix :)
 				if (globalThis.simulator) {
 					globalThis.simulator.destroy();
@@ -167,8 +178,8 @@
 					}
 					else if (getExtension() === ARM_EXTENSION)
 					{
-						globalThis.objFile = ARMAssembler.getObjectFileBlob()
-						globalThis.symbolTable = ARMAssembler.getSymbolTableBlob()
+						//globalThis.objFile = ARMAssembler.getObjectFileBlob()
+						//globalThis.symbolTable = ARMAssembler.getSymbolTableBlob()
 					}
 				}
 			}

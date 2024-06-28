@@ -3,7 +3,7 @@
         Switch and transition between dark and light mode styles
 -->
 
-<script>
+<script lang="ts">
     import ThemeIcon from "./ThemeIcon.svelte";
     import { darkMode } from "@/lib/stores"
     import { onMount } from "svelte"
@@ -14,9 +14,9 @@
     let colorB = 62
     let colorH = 42
 
-    let idN, stepN = 0
-    let idB, stepB = 0
-    let idH, stepH = 0
+    let idN = 0, stepN = 0
+    let idH = 0, stepH = 0
+    let idB = 0, stepB = 0
 
     // Elements for color lerping (values hardcoded)
     let body = {
@@ -42,7 +42,8 @@
     function swap(){ darkMode.set(!isDark) }
 
     // Change opacity of workspace
-    function fadeWorkspace(value){
+
+    function fadeWorkspace(value: string){
         let workspace = document.getElementById("workspace")
             if (workspace)
                 workspace.style.opacity = value
@@ -50,7 +51,8 @@
 
     // Lerp animation
     let steps = 15
-    function lerp(id, step, el, currColor, destColor, endStep=false){
+
+    function lerp(id: number | NodeJS.Timeout, step: number, el: HTMLElement | null, currColor: number, destColor: number, endStep=false){
         if(el){
             if (!endStep)
                 step = 0
@@ -62,8 +64,8 @@
                 step++
                 if(destColor > currColor){
                     currColor = Math.floor(currColor + (destColor - currColor)/steps*step)
-                    if(destColor == 252) { el.style.left = `${30-(step*2)}px` } // hacky
-                    el.style.backgroundColor = `rgb(${currColor},${currColor},${currColor})`
+                    if(destColor == 252) { el!.style.left = `${30-(step*2)}px` } // hacky
+                    el!.style.backgroundColor = `rgb(${currColor},${currColor},${currColor})`
                     if(step == steps){ 
                         clearInterval(id)
                         colorB = body.light
@@ -75,8 +77,8 @@
                 } 
                 else {
                     currColor = Math.floor(currColor - (currColor - destColor)/steps*step)
-                    if(destColor == 0) { el.style.left = `${step*2}px` } // hacky
-                    el.style.backgroundColor = `rgb(${currColor},${currColor},${currColor})`
+                    if(destColor == 0) { el!.style.left = `${step*2}px` } // hacky
+                    el!.style.backgroundColor = `rgb(${currColor},${currColor},${currColor})`
                     if(step == steps){ 
                         clearInterval(id)
                         colorB = body.dark
@@ -91,8 +93,8 @@
     }
 
     // Lerp modes
-    function lerpTo(mode, endStep=false){
-        lerp(node.id, node.step, document.getElementById("switch").firstChild, colorN, node[mode], endStep)
+    function lerpTo(mode: "dark" | "light", endStep=false){
+        lerp(node.id, node.step, document.getElementById("switch")?.firstChild as HTMLElement, colorN, node[mode], endStep)
         lerp(body.id, body.step, document.body, colorB, body[mode], endStep)
         lerp(head.id, head.step, document.getElementById("header"), colorH, head[mode], endStep)
         fadeWorkspace("40%")

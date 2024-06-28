@@ -14,7 +14,7 @@
     "vite": "vite",
     "vite:build": "vite build",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json",
-    "svelte-check": "svelte-check --tsconfig ./tsconfig.json",
+    "svelte-check": "svelte-check --tsconfig ./tsconfig.json --compiler-warnings \"css-unused-selector:ignore\"",
     "typecheck": "pnpm typecheck:node && pnpm svelte-check",
     "build": "pnpm typecheck && pnpm vite:build",
     "build:win": "pnpm build && electron-builder build --win",

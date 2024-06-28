@@ -588,7 +588,7 @@ export default class Parser {
         tokens[2],
         pc,
         labels,
-        Parser.immBitCounts.get(tokens[0]),
+        Parser.immBitCounts.get(tokens[0])!,
         lineNum
       );
       if (isNaN(offset)) return NaN;
