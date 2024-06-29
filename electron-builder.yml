@@ -7,16 +7,21 @@ files:
   - 'electron'
   - 'dist'
   - 'node_modules'
-win:
-  executableName: lc3-electron
-nsis:
-  artifactName: ${name}-${version}-setup.${ext}
-  shortcutName: ${productName}
-  uninstallDisplayName: ${productName}
-  createDesktopShortcut: always
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
   provider: generic
   url: https://example.com/auto-updates
+win:
+  executableName: lc3-electron
+nsis:
+  artifactName: ${name}-${version}-setup.${ext}
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: true
+mac:
+  category: public.app-category.education
+  target: default
+  darkModeSupport: true
+  type: development
