@@ -1,25 +1,31 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte'
     import { ResizeObserver } from 'resize-observer'
-    import { InitMonacoEditor } from "@/lib/editor";
+    import { EditManager, InitGlobalMonaco } from "@/lib/editor";
     import { latestSnapshot, editorLoaded } from '@/lib/stores';
 
+    export let editor: EditManager;
+
+    let monacoReady = false;
+
+    editor.monacoInitialized.subscribe(v => monacoReady = v);
+
     onMount(async () => {
-        if (!globalThis.editor) {
-            await InitMonacoEditor();
+        if (!monacoReady) {
+            await editor.InitMonacoEditor();
         }
         else {
-            let content = globalThis.editor.getValue();
+            let content = editor.value;
             latestSnapshot.set(content)
         }
 
-        let editor = document.getElementById("editorCtr");
-        if (editor) {
-            editor.innerHTML = "";
-            let monaco = globalThis.editor.getContainerDomNode();
-            editor.appendChild(monaco);
+        let eCtr = document.getElementById("editorCtr");
+        if (eCtr) {
+            eCtr.innerHTML = "";
+            let monaco = editor.getMonacoContainer();
+            eCtr.appendChild(monaco);
             let ro = new ResizeObserver(() => { resize() });
-            ro.observe(editor);
+            ro.observe(eCtr);
             resize();
             editorLoaded.set(true);
         }
@@ -30,8 +36,8 @@
     })
 
     function resize() {
-        if(globalThis.editor) {
-            globalThis.editor.layout();
+        if(monacoReady) {
+            editor.layoutMonaco();
         }
     }
 </script>

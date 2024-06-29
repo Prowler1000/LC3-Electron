@@ -4,11 +4,14 @@
 -->
 
 <script>
-    import EditorView from '@/views/Editor.svelte';
-    import SimulatorView from '@/views/Simulator.svelte';
+    import EditorView from '@/views/EditorView.svelte';
+    import SimulatorView from '@/views/SimulatorView.svelte';
     import { currentView } from '@/lib/stores'
 
+    import { EditManager } from '@/lib/editor';
+
     let currView = "editor"
+    let editManager = new EditManager();
 
     // Switch current view component
     currentView.subscribe(value => {
@@ -19,7 +22,7 @@
 <div id="workspace">
     <div id="workspace-inner">
         {#if currView == "editor"}
-            <EditorView />
+            <EditorView editor={editManager} />
         {:else}
             <SimulatorView />
         {/if}
