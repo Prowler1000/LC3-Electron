@@ -151,7 +151,11 @@
         </button>
         <button id="save" class="menu-item" on:click={click} role="menuitem" aria-label="Save file to device">
             <span class="material-symbols-outlined">save</span>
+            {#if unsavedChanges}
             <p>Save</p>
+            {:else}
+            <p>Saved</p>
+            {/if}
         </button>
     {:else}
         <button id="reload" class="menu-item" on:click={click} role="menuitem" aria-label="Reload simulator">

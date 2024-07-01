@@ -86,6 +86,18 @@ const writeFile = (event, ...args) => {
     fs.writeFile(args[0], args[1], () => event.sender.send('write-complete'))
 }
 
+const dirname = (event, ...args) => {
+    return path.dirname(args[0]);
+}
+
+const basename = (event, ...args) => {
+    return path.basename(args[0]);
+}
+
+const joinPaths = (event, ...args) => {
+    return path.join(...args);
+}
+
 let listeners = {
 
 }
@@ -93,6 +105,9 @@ let listeners = {
 let invokeables = {
     'save-dialog': saveDialog,
     'write-file': writeFile,
+    'join-paths': joinPaths,
+    'basename': basename,
+    'dirname': dirname,
 }
 
 function registerListeners() {

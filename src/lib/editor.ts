@@ -5,9 +5,12 @@ import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
 import { derived, get, readonly, writable, type Writable } from 'svelte/store';
+import { editor, KeyCode, KeyMod } from 'monaco-editor';
+
+
 
 export class EditManager {
-  private monaco: import('monaco-editor').editor.IStandaloneCodeEditor;
+  private monacoEditor: editor.IStandaloneCodeEditor;
 
   // PRIVATE STORES
   private monacoReady = writable(false);
@@ -17,19 +20,23 @@ export class EditManager {
   // PUBLIC READ-ONLY STORES
   public monacoInitialized = readonly(this.monacoReady);
   public filename = writable("untitled.asm");
+  public filepath = writable("");
 
   public async InitMonacoEditor() {
-    this.monaco = await InitMonaco();
-    this.monaco.getModel()?.onDidChangeContent(() => {this.onContentChange()});
+    this.monacoEditor = await InitMonaco();
+
+    this.monacoEditor.getModel()?.onDidChangeContent(() => {this.onContentChange()});
+    this.monacoEditor.addCommand(KeyMod.CtrlCmd | KeyCode.KeyS, () => this.save());
+
     this.monacoReady.set(true);
   }
 
   public getMonacoContainer(): HTMLElement{
-    return this.monaco.getContainerDomNode();
+    return this.monacoEditor.getContainerDomNode();
   }
 
   public layoutMonaco() {
-    this.monaco.layout();
+    this.monacoEditor.layout();
   }
 
   public hasUnsavedChanges = derived<[Writable<number>, Writable<number>], boolean>(
@@ -39,8 +46,25 @@ export class EditManager {
   ], ([oldId, currId], set) => { set(oldId !== currId); }
 )
 
+  public fullpath = derived<[Writable<string>, Writable<string>], string>(
+    [
+      this.filepath,
+      this.filename
+    ], ([fpath, fname], set) => { window.api.path.join(fpath, fname).then(res => set(res)); }
+  )
+
   // I REALLY DONT KNOW
   // #region
+
+  public async save() {
+    let path = get(this.filepath);
+    if (path.length <= 0) {
+      // We haven't saved the file anywhere yet so we need to now
+      return this.saveAs();
+    }
+    let fullpath = await window.api.path.join(path, get(this.filename))
+    await window.api.dialogs.save(fullpath, this.value, () => this.onSave());
+  }
 
   /**
    * Opens a "Save as" dialog to select the location to save
@@ -58,7 +82,7 @@ export class EditManager {
 
   private async onSave() {
     // Store the current version ID for detecting unsaved changes
-    let model = this.monaco.getModel();
+    let model = this.monacoEditor.getModel();
     if (model) {
       this.lastSavedVersionId.set(model.getAlternativeVersionId());
     }
@@ -70,18 +94,24 @@ export class EditManager {
   //  #region 
 
   private onContentChange() {
-    let ver_id = this.monaco.getModel()?.getAlternativeVersionId();
+    let ver_id = this.monacoEditor.getModel()?.getAlternativeVersionId();
     if (ver_id !== undefined) {
       this.currentVersionId.set(ver_id);
     }
   }
 
 
-  private compareNamePath(fullpath: string) {
-    // TODO:  Implement checking whether the save location and file name
-    //        saved to during "saveAs" matches our current file name and path.
-    //        If not, we need to set it to match as that's our new save target
-    //        when saving without prompt
+  private async compareNamePath(fullpath: string) {
+    let currFileName = get(this.filename);
+    let currFilePath = get(this.filepath);
+    let fileName = await window.api.path.basename(fullpath);
+    if (currFileName !== fileName) {
+      this.filename.set(fileName);
+    }
+    let filePath = await window.api.path.dirname(fullpath);
+    if (currFilePath !== filePath) {
+      this.filepath.set(filePath);
+    }
   }
 
   //#endregion
@@ -91,7 +121,7 @@ export class EditManager {
   //  #region
   
   get value(): string {
-    return this.monaco?.getValue() || "";
+    return this.monacoEditor?.getValue() || "";
   }
 
   //#endregion

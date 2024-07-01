@@ -34,7 +34,7 @@
 	function toSimulator() { currentView.set("simulator") }
 	// Current .asm program filename
 	export let filename = "untitled.asm"
-	openedFile.subscribe(value => { filename = value });
+	editor.filename.subscribe(value => { filename = value });
 	// Text to show on filename component
 	$: showText = filename
 	// Stifle other functions from firing if input is open
@@ -116,7 +116,7 @@
 				if (!newValue.endsWith(".asm") && !newValue.endsWith('.s'))
 					newValue += ".asm"
 
-				openedFile.set(newValue)
+				editor.filename.set(newValue)
 			}
 		}
 
