@@ -1,5 +1,7 @@
 {
-  "extends": "@tsconfig/svelte/tsconfig.json",
+  "extends": [
+    "@tsconfig/svelte/tsconfig.json",
+  ],
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
@@ -20,7 +22,7 @@
       "@/*": ["./src/*"],
       "@lib/*": ["./src/lib/*"],
       "@logic/*": ["./src/logic/*"]
-    },
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "global.d.ts", "electron/preload.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }],

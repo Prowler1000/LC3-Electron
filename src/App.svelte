@@ -2,11 +2,14 @@
   import "./app.css"
   import Workspace from "./presentation/Workspace.svelte";
   import Header from "./components/Header.svelte";
+  import { EditManager } from "./lib/editor";
+
+  let editor = new EditManager();
 </script>
 
 <main>
-  <Header />
-  <Workspace />
+  <Header {editor}/>
+  <Workspace {editor}/>
 </main>
 
 <style>

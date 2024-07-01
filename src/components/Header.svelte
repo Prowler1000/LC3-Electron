@@ -1,12 +1,14 @@
-<script>
+<script lang="ts">
     import Menu from "./header/Menu.svelte";
     import Title from "./header/Title.svelte";
     import ThemeToggle from "./header/ThemeToggle.svelte";
     import { currentView, editorLoaded } from "@/lib/stores";
     import { onMount } from "svelte";
+    import type { EditManager } from "@/lib/editor";
 
     // Set view-specific interface and controls
     let currView = "editor"
+    export let editor: EditManager;
     currentView.subscribe(value => { currView = value });
 
     let editorReady = false
@@ -17,7 +19,7 @@
     <div id="header-inner" role="group" aria-labelledby="header">
         {#if editorReady}
             <Title subtitle="Read the {currView} guide" />
-            <Menu {currView} />
+            <Menu {currView} {editor} />
             <ThemeToggle />
         {:else}
             <Title />

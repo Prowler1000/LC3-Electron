@@ -13,5 +13,5 @@ export default defineConfig({
         "@lib": path.resolve(__dirname, "./src/lib"),
         "@logic": path.resolve(__dirname, "./src/logic"),
     },
-},
+  }
 })

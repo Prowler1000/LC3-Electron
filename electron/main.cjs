@@ -1,7 +1,8 @@
 // Modules to control application life and create native browser window
 const { log } = require('console')
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
+const fs = require('fs')
 
 app.commandLine.appendSwitch("enable-features", "SharedArrayBuffer");
 
@@ -22,7 +23,15 @@ const createWindow = () => {
 
     // define how electron will load the app
     if (isDevEnvironment) {
-
+        const electron = require('electron')
+        let displays = electron.screen.getAllDisplays()
+        let externalDisplay = displays.find((display) => {
+            return display.bounds.x !== 0 || display.bounds.y !== 0
+        })
+        if (externalDisplay) {
+            mainWindow.setPosition(externalDisplay.bounds.x, externalDisplay.bounds.y);
+            mainWindow.maximize();
+        }
         // if your vite app is running on a different port, change it here
         mainWindow.loadURL('http://localhost:5173/');
 
@@ -60,3 +69,39 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+const saveDialog = async (event, ...args) => {
+    return dialog.showSaveDialog(mainWindow,
+    {
+        defaultPath: args[0] === undefined ? args[0] : '',
+        properties: [
+            "createDirectory",
+            "dontAddToRecent",
+            "showOverwriteConfirmation",
+        ],
+    });
+}
+
+const writeFile = (event, ...args) => {
+    fs.writeFile(args[0], args[1], () => event.sender.send('write-complete'))
+}
+
+let listeners = {
+
+}
+
+let invokeables = {
+    'save-dialog': saveDialog,
+    'write-file': writeFile,
+}
+
+function registerListeners() {
+    Object.entries(listeners).forEach(([channel, handler]) => {
+        ipcMain.on(channel, handler);
+    });
+    Object.entries(invokeables).forEach(([channel, handler]) => {
+        ipcMain.handle(channel, handler);
+    });
+}
+
+app.whenReady().then(registerListeners());

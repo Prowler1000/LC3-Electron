@@ -1,8 +1,10 @@
 <script lang="ts">
     import { onMount } from "svelte"
     import { openedFile, reloadOverride, latestSnapshot } from '@/lib/stores'
+  import type { EditManager } from "@/lib/editor";
     
     export let currView = "editor"
+    export let editor: EditManager;
 
     let filename = ""
     openedFile.subscribe(value => { filename = value });
@@ -85,12 +87,8 @@
     }
 
     // Save: Save Editor content as .asm or .s file to client's local filesystem
-    function saveClick(){
-        if(globalThis.editor){
-            let content = globalThis.editor.getValue()
-            latestSnapshot.set(content)
-            download(filename,content)
-        }
+    async function saveClick(){
+        await editor.saveAs();
     }
     let download = (fileName: string, data: string) => {}
 

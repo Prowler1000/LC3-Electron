@@ -11,7 +11,7 @@
     import { EditManager } from '@/lib/editor';
 
     let currView = "editor"
-    let editManager = new EditManager();
+    export let editor;
 
     // Switch current view component
     currentView.subscribe(value => {
@@ -22,7 +22,7 @@
 <div id="workspace">
     <div id="workspace-inner">
         {#if currView == "editor"}
-            <EditorView editor={editManager} />
+            <EditorView {editor} />
         {:else}
             <SimulatorView />
         {/if}

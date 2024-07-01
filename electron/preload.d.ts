@@ -1,4 +1,4 @@
-import { api } from './preload.ts';
+import { api } from './preload.cjs';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
@@ -7,4 +7,3 @@ declare global {
   }
 }
 
-export {};

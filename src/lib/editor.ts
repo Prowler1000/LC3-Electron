@@ -13,6 +13,16 @@ export class EditManager {
   public monacoInitialized = readonly(this.monacoReady);
   public filename = writable("untitled.asm");
 
+  private async onSave() {
+    // We don't do anything currently
+  }
+
+  private compareNamePath(fullpath: string) {
+    // TODO:  Implement checking whether the save location and file name
+    //        saved to during "saveAs" matches our current file name and path.
+    //        If not, we need to set it to match as that's our new save target
+    //        when saving without prompt
+  }
 
   public async InitMonacoEditor() {
     this.monaco = await InitMonaco();
@@ -37,9 +47,12 @@ export class EditManager {
    * is editing an existing file
    * @param defaultPath The default location to open the dialog to
    */
-  public saveAs(defaultPath: string | undefined): boolean {
-    
-    return false;
+  public async saveAs(defaultPath?: string): Promise<boolean> {
+    let result = await window.api.dialogs.saveAs(defaultPath, this.value, this.onSave);
+    if (!result.cancelled) {
+      this.compareNamePath(result.filePath);
+    }
+    return result.cancelled
   }
 
 }
