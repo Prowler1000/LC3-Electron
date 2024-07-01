@@ -10,6 +10,10 @@ export class EditManager {
   private monaco: import('monaco-editor').editor.IStandaloneCodeEditor;
   private monacoReady = writable(false);
 
+  public monacoInitialized = readonly(this.monacoReady);
+  public filename = writable("untitled.asm");
+
+
   public async InitMonacoEditor() {
     this.monaco = await InitMonaco();
     this.monacoReady.set(true);
@@ -27,7 +31,17 @@ export class EditManager {
     this.monaco.layout();
   }
 
-  public monacoInitialized = readonly(this.monacoReady);
+  /**
+   * Opens a "Save as" dialog to select the location to save
+   * the currently opened file, regardless of whether the user
+   * is editing an existing file
+   * @param defaultPath The default location to open the dialog to
+   */
+  public saveAs(defaultPath: string | undefined): boolean {
+    
+    return false;
+  }
+
 }
 
 async function InitMonaco() {

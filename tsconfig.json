@@ -22,6 +22,6 @@
       "@logic/*": ["./src/logic/*"]
     },
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "global.d.ts"],
+  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "global.d.ts", "electron/preload.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }],
 }

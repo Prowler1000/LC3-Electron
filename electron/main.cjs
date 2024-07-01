@@ -28,7 +28,7 @@ const createWindow = () => {
 
         // Open the DevTools.
         mainWindow.webContents.on("did-frame-finish-load", () => {
-            mainWindow.webContents.openDevTools();
+            //mainWindow.webContents.openDevTools();
         });
 
         log('Electron running in dev mode: 🧪')
