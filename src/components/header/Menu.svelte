@@ -1,13 +1,16 @@
 <script lang="ts">
     import { onMount } from "svelte"
     import { openedFile, reloadOverride, latestSnapshot } from '@/lib/stores'
-  import type { EditManager } from "@/lib/editor";
+    import type { EditManager } from "@/lib/editor";
     
     export let currView = "editor"
     export let editor: EditManager;
 
     let filename = ""
     openedFile.subscribe(value => { filename = value });
+
+    let unsavedChanges = false;
+    editor.hasUnsavedChanges.subscribe(val => unsavedChanges = val);
 
     export let readOnly = false
 

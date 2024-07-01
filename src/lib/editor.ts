@@ -4,33 +4,24 @@ import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-import { get, readonly, writable } from 'svelte/store';
+import { derived, get, readonly, writable, type Writable } from 'svelte/store';
 
 export class EditManager {
   private monaco: import('monaco-editor').editor.IStandaloneCodeEditor;
-  private monacoReady = writable(false);
 
+  // PRIVATE STORES
+  private monacoReady = writable(false);
+  private lastSavedVersionId = writable(0);
+  private currentVersionId = writable(1);
+
+  // PUBLIC READ-ONLY STORES
   public monacoInitialized = readonly(this.monacoReady);
   public filename = writable("untitled.asm");
 
-  private async onSave() {
-    // We don't do anything currently
-  }
-
-  private compareNamePath(fullpath: string) {
-    // TODO:  Implement checking whether the save location and file name
-    //        saved to during "saveAs" matches our current file name and path.
-    //        If not, we need to set it to match as that's our new save target
-    //        when saving without prompt
-  }
-
   public async InitMonacoEditor() {
     this.monaco = await InitMonaco();
+    this.monaco.getModel()?.onDidChangeContent(() => {this.onContentChange()});
     this.monacoReady.set(true);
-  }
-
-  get value(): string {
-    return this.monaco?.getValue() || "";
   }
 
   public getMonacoContainer(): HTMLElement{
@@ -41,6 +32,16 @@ export class EditManager {
     this.monaco.layout();
   }
 
+  public hasUnsavedChanges = derived<[Writable<number>, Writable<number>], boolean>(
+  [
+    this.lastSavedVersionId,
+    this.currentVersionId,
+  ], ([oldId, currId], set) => { set(oldId !== currId); }
+)
+
+  // I REALLY DONT KNOW
+  // #region
+
   /**
    * Opens a "Save as" dialog to select the location to save
    * the currently opened file, regardless of whether the user
@@ -48,14 +49,56 @@ export class EditManager {
    * @param defaultPath The default location to open the dialog to
    */
   public async saveAs(defaultPath?: string): Promise<boolean> {
-    let result = await window.api.dialogs.saveAs(defaultPath, this.value, this.onSave);
+    let result = await window.api.dialogs.saveAs(defaultPath, this.value, () => this.onSave());
     if (!result.cancelled) {
       this.compareNamePath(result.filePath);
     }
     return result.cancelled
   }
 
+  private async onSave() {
+    // Store the current version ID for detecting unsaved changes
+    let model = this.monaco.getModel();
+    if (model) {
+      this.lastSavedVersionId.set(model.getAlternativeVersionId());
+    }
+  }
+
+  //#endregion
+  
+  //  PRIVATE CLASS METHODS
+  //  #region 
+
+  private onContentChange() {
+    let ver_id = this.monaco.getModel()?.getAlternativeVersionId();
+    if (ver_id !== undefined) {
+      this.currentVersionId.set(ver_id);
+    }
+  }
+
+
+  private compareNamePath(fullpath: string) {
+    // TODO:  Implement checking whether the save location and file name
+    //        saved to during "saveAs" matches our current file name and path.
+    //        If not, we need to set it to match as that's our new save target
+    //        when saving without prompt
+  }
+
+  //#endregion
+
+
+  //  GETTERS AND SETTERS
+  //  #region
+  
+  get value(): string {
+    return this.monaco?.getValue() || "";
+  }
+
+  //#endregion
+
 }
+
+
 
 async function InitMonaco() {
   let editor;
