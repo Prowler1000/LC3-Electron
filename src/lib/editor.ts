@@ -44,7 +44,7 @@ export class EditManager {
     this.lastSavedVersionId,
     this.currentVersionId,
   ], ([oldId, currId], set) => { set(oldId !== currId); }
-)
+  )
 
   public fullpath = derived<[Writable<string>, Writable<string>], string>(
     [
@@ -55,6 +55,18 @@ export class EditManager {
 
   // I REALLY DONT KNOW
   // #region
+
+  public async reset(do_save: boolean) {
+    let resetOK = !do_save;
+    if (do_save) {
+      resetOK = await this.save(); // If the user cancels the save, don't wipe their work
+    }
+    if (resetOK) {
+      this.monacoEditor.setValue("");
+      this.filename.set("untitled.asm");
+      this.filepath.set("");
+    }
+  }
 
   public async open() {
     let results = await window.api.dialogs.open();
@@ -73,6 +85,7 @@ export class EditManager {
     }
     let fullpath = await window.api.path.join(path, get(this.filename))
     await window.api.dialogs.save(fullpath, this.value, () => this.onSave());
+    return true;
   }
 
   /**
@@ -83,10 +96,10 @@ export class EditManager {
    */
   public async saveAs(defaultPath?: string): Promise<boolean> {
     let result = await window.api.dialogs.saveAs(defaultPath, this.value, () => this.onSave());
-    if (!result.cancelled) {
+    if (!result.canceled) {
       this.compareNamePath(result.filePath);
     }
-    return result.cancelled
+    return !result.canceled
   }
 
   private async onSave() {

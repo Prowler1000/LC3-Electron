@@ -1,13 +1,10 @@
 <script lang="ts">
     import { onMount } from "svelte"
-    import { openedFile, reloadOverride, latestSnapshot } from '@/lib/stores'
+    import { reloadOverride } from '@/lib/stores'
     import type { EditManager } from "@/lib/editor";
     
     export let currView = "editor"
     export let editor: EditManager;
-
-    let filename = ""
-    openedFile.subscribe(value => { filename = value });
 
     let unsavedChanges = false;
     editor.hasUnsavedChanges.subscribe(val => unsavedChanges = val);
@@ -16,106 +13,36 @@
 
     /* EDITOR MENU CONTROLS */
 
-    // Meta click handler
-    function click(this: { id: string; class: string; "on:click": () => void; role: "menuitem"; "aria-label": string; }) {
-        if (!readOnly) {
-            let type = this.id;
-            switch (type) {
-                case "new":
-                    newClick();
-                    break;
-                case "open":
-                    openClick();
-                    break;
-                case "save":
-                    saveClick();
-                    break;
-                case "reload":
-                    reloadClick();
-                    break;
-                case "reinitialize":
-                    reinitializeClick();
-                    break;
-                case "randomize":
-                    randomizeClick();
-                    break;
-                default:
-                    throw new Error("Invalid click ID. This shouldn't be possible (afaik) but here we are.");
-            }
-        }
-    }
-
     // New: Reset Editor and filename
-    function newClick(){
-        if (confirm('Are you sure you want to start over?\n\nWARNING: This will clear the editor. Make sure to save your current progress first.')) {
-            let editor = globalThis.editor
-            if(editor){
-                editor.setValue("")
-                updateFilename("untitled.asm")
-                openedFile.set("untitled.asm")
-                latestSnapshot.set("")
-            }
+    function newClick(doSave?: boolean){
+        if (readOnly) return;
+        if (unsavedChanges && doSave === undefined) {
+            let dialog = document.querySelector("dialog");
+            dialog?.showModal();
         }
-    }// Open: Open an existing .asm file and load content to Editor
-    async function openClick(){
-        await editor.open();
-        //let opener = document.getElementById("opener")
-        //opener?.click()
+        else {
+            // (this asserts that doSave is defined, not that it's false)
+            editor.reset(unsavedChanges && doSave!);
+        }
     }
-    function openFile(){
-        let files = (document.getElementById("opener") as HTMLInputElement).files
-        if (files && files.length > 0) {
-            let filename = files[0].name
-            let extension = filename.split('.').pop();
-            extension = extension?.split('.').pop();
-            if(extension == "asm" || extension == "s"){
-                const reader = new FileReader()
-                reader.readAsText(files[0]);
-                reader.onload = function() {
-                    let editor = globalThis.editor
-                    if(editor){
-                        let result = reader.result?.toString()
-                        if (result){
-                            editor.setValue(result)
-                            updateFilename(filename)
-                            latestSnapshot.set(result)
-                        }
-                    }
-                    else
-                        console.error("Reading file to editor failed.")
-                };
-            } else {
-                alert("Invalid file. WebLC3 only accepts .asm and .s files.")
-            }
-        }
+    
+    // Open: Open an existing .asm file and load content to Editor
+    async function openClick(){
+        if (readOnly) return;
+        await editor.open();
     }
 
     // Save: Save Editor content as .asm or .s file to client's local filesystem
     async function saveClick(){
+        if (readOnly) return;
         await editor.saveAs();
     }
-    let download = (fileName: string, data: string) => {}
-
-    // Load download function on application load
-    onMount(() => {
-        download = (fileName: string, data) => {
-            var a = document.createElement("a")
-            document.body.appendChild(a)
-            var blob = new Blob([data], { type: "plain/text" })
-            let url = window.URL.createObjectURL(blob);
-            a.href = url;
-            a.download = fileName;
-            a.click();
-            window.URL.revokeObjectURL(url)
-        }
-    });
-    // Update filename reflected in EditorView
-    function updateFilename(fn: string) { openedFile.set(fn) }
 
     /* SIMULATOR MENU CONTROLS */
 
     // Reload: Load code into memory, set PC to start of program, restore Processor Status Register to defaults, set clock-enable
     function reloadClick(){
+        if (readOnly) return;
         if(globalThis.simulator){
             globalThis.simulator.reloadProgram()
             reloadOverride.set([true,true])
@@ -124,6 +51,7 @@
 
     // Reinitialize: Set all of memory to zeroes except for operating system code
     function reinitializeClick(){
+        if (readOnly) return;
         if(globalThis.simulator){
             globalThis.simulator.resetMemory()
             reloadOverride.set([true,false])
@@ -132,6 +60,7 @@
 
     // Randomize: Randomize all of memory except for operating system code
     function randomizeClick(){
+        if (readOnly) return;
         if(globalThis.simulator){
             globalThis.simulator.randomizeMemory()
             reloadOverride.set([true,false])
@@ -140,17 +69,24 @@
 </script>
 
 <div id="menu" class="workSans" role="menubar" aria-label="Editor and simulator work controls">
+    <dialog>
+        <p>You have unsaved changes. Would you like to save them now?</p>
+        <form method="dialog">
+            <button>Cancel</button>
+            <button on:click={() => newClick(false)}>No</button>
+            <button on:click={() => newClick(true)}>Yes</button>
+        </form>
+    </dialog>
     {#if currView == "editor"}
-        <button id="new" class="menu-item" on:click={click} role="menuitem" aria-label="Start new file">
+        <button id="new" class="menu-item" on:click={() => newClick()} role="menuitem" aria-label="Start new file">
             <span class="material-symbols-outlined">note_add</span>
             <p>New</p>
         </button>
-        <input id="opener" type="file" style="display:none;" on:change={openFile}>
-        <button id="open" class="menu-item" on:click={click} role="menuitem" aria-label="Open assembly file from device">
+        <button id="open" class="menu-item" on:click={() => openClick()} role="menuitem" aria-label="Open assembly file from device">
             <span class="material-symbols-outlined">folder</span>
             <p>Open</p>
         </button>
-        <button id="save" class="menu-item" on:click={click} role="menuitem" aria-label="Save file to device">
+        <button id="save" class="menu-item" on:click={() => saveClick()} role="menuitem" aria-label="Save file to device">
             <span class="material-symbols-outlined">save</span>
             {#if unsavedChanges}
             <p>Save</p>
@@ -159,15 +95,15 @@
             {/if}
         </button>
     {:else}
-        <button id="reload" class="menu-item" on:click={click} role="menuitem" aria-label="Reload simulator">
+        <button id="reload" class="menu-item" on:click={() => reloadClick()} role="menuitem" aria-label="Reload simulator">
             <span class="material-symbols-outlined">refresh</span>
             <p>Reload</p>
         </button>
-        <button id="reinitialize" class="menu-item" on:click={click} role="menuitem" aria-label="Reinitialize simulator">
+        <button id="reinitialize" class="menu-item" on:click={() => reinitializeClick()} role="menuitem" aria-label="Reinitialize simulator">
             <span class="material-symbols-outlined">power_settings_new</span>
             <p>Reinitialize</p>
         </button>
-        <button id="randomize" class="menu-item" on:click={click} role="menuitem" aria-label="Randomize simulator">
+        <button id="randomize" class="menu-item" on:click={() => randomizeClick()} role="menuitem" aria-label="Randomize simulator">
             <span class="material-symbols-outlined">shuffle</span>
             <p>Randomize</p>
         </button>
