@@ -1,6 +1,6 @@
 // Modules to control application life and create native browser window
 const { log } = require('console')
-const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { app, BrowserWindow, session, ipcMain, dialog } = require('electron')
 const path = require('path')
 const fs = require('fs')
 
@@ -67,8 +67,6 @@ app.on('activate', () => {
 //     if (process.platform !== 'darwin') app.quit()
 // })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
 
 const saveDialog = async (event, ...args) => {
     return dialog.showSaveDialog(mainWindow,
@@ -138,4 +136,14 @@ function registerListeners() {
     });
 }
 
-app.whenReady().then(registerListeners());
+app.whenReady().then(() => {
+    registerListeners();
+    session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+        callback({
+            responseHeaders: {
+                ...details.responseHeaders,
+                'Content-Security-Policy': ['default-src \'self\' \'unsafe-inline\' https://fonts.googleapis.com https://fonts.gstatic.com']
+            }
+        })
+    })
+});
