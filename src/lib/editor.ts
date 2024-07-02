@@ -56,6 +56,15 @@ export class EditManager {
   // I REALLY DONT KNOW
   // #region
 
+  public async open() {
+    let results = await window.api.dialogs.open();
+    if (results.completed) {
+      this.filename.set(results.fileName);
+      this.filepath.set(results.filePath);
+      this.monacoEditor.setValue(results.fileContent);
+    }
+  }
+
   public async save() {
     let path = get(this.filepath);
     if (path.length <= 0) {

@@ -141,49 +141,46 @@
 
 	// Assemble program
 	async function assembleClick(){
-		let editor = globalThis.editor
-		if(editor){
-			let sourceCode = editor.getValue()
-			let obj;
+		let sourceCode = editor.value
+		let obj;
 
-			if (getExtension() === LC3_EXTENSION)
-				obj = await Assembler.assemble(sourceCode)
-			else if (getExtension() === ARM_EXTENSION)
-				obj = null //await ARMAssembler.assemble(sourceCode)
-			else
-				alert(`File ${filename} could not be assembled due to invalid extension. WebLC3 only accepts .asm and .s files.`);
+		if (getExtension() === LC3_EXTENSION)
+			obj = await Assembler.assemble(sourceCode)
+		else if (getExtension() === ARM_EXTENSION)
+			obj = null //await ARMAssembler.assemble(sourceCode)
+		else
+			alert(`File ${filename} could not be assembled due to invalid extension. WebLC3 only accepts .asm and .s files.`);
 
-			if(obj){
-				// Create globally-available Simulator class
-				let map = obj.pop()
-				if (!map) {
-					throw Error("Map not defined. Source code assembly failed.")
+		if(obj){
+			// Create globally-available Simulator class
+			let map = obj.pop()
+			if (!map) {
+				throw Error("Map not defined. Source code assembly failed.")
+			}
+			if (map instanceof Uint16Array) {
+				throw Error("Trying to pass Uint16Array to simulator as source code.")
+			}
+			// Clean up existing simulator. "Temporary" fix :)
+			if (globalThis.simulator) {
+				globalThis.simulator.destroy();
+			}
+			globalThis.simulator = new Simulator(obj[0], map, getExtension())
+			globalThis.lastPtr = null
+			globalThis.lastBps = null
+
+			// Globally store .obj file, and symbol table file blobs
+			if(globalThis.simulator){
+				setObjFilename()
+
+				if (getExtension() === LC3_EXTENSION)
+				{
+					globalThis.objFile = Assembler.getObjectFileBlob()
+					globalThis.symbolTable = Assembler.getSymbolTableBlob()
 				}
-				if (map instanceof Uint16Array) {
-					throw Error("Trying to pass Uint16Array to simulator as source code.")
-				}
-				// Clean up existing simulator. "Temporary" fix :)
-				if (globalThis.simulator) {
-					globalThis.simulator.destroy();
-				}
-				globalThis.simulator = new Simulator(obj[0], map, getExtension())
-				globalThis.lastPtr = null
-				globalThis.lastBps = null
-
-				// Globally store .obj file, and symbol table file blobs
-				if(globalThis.simulator){
-					setObjFilename()
-
-					if (getExtension() === LC3_EXTENSION)
-					{
-						globalThis.objFile = Assembler.getObjectFileBlob()
-						globalThis.symbolTable = Assembler.getSymbolTableBlob()
-					}
-					else if (getExtension() === ARM_EXTENSION)
-					{
-						//globalThis.objFile = ARMAssembler.getObjectFileBlob()
-						//globalThis.symbolTable = ARMAssembler.getSymbolTableBlob()
-					}
+				else if (getExtension() === ARM_EXTENSION)
+				{
+					//globalThis.objFile = ARMAssembler.getObjectFileBlob()
+					//globalThis.symbolTable = ARMAssembler.getSymbolTableBlob()
 				}
 			}
 		}

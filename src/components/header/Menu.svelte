@@ -57,9 +57,10 @@
             }
         }
     }// Open: Open an existing .asm file and load content to Editor
-    function openClick(){
-        let opener = document.getElementById("opener")
-        opener?.click()
+    async function openClick(){
+        await editor.open();
+        //let opener = document.getElementById("opener")
+        //opener?.click()
     }
     function openFile(){
         let files = (document.getElementById("opener") as HTMLInputElement).files

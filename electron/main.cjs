@@ -86,6 +86,23 @@ const writeFile = (event, ...args) => {
     fs.writeFile(args[0], args[1], () => event.sender.send('write-complete'))
 }
 
+const readFile = async (event, ...args) => {
+    let buffer = fs.readFileSync(args[0]);
+    return buffer.toString();
+}
+
+const openDialog = async (event, ...args) => {
+    return dialog.showOpenDialog(mainWindow,
+        {
+            filters: [{extensions: ["*.asm", "*.s"]}],
+            properties: [
+                "openFile",
+                "dontAddToRecent"
+            ]
+        }
+    )
+}
+
 const dirname = (event, ...args) => {
     return path.dirname(args[0]);
 }
@@ -108,6 +125,8 @@ let invokeables = {
     'join-paths': joinPaths,
     'basename': basename,
     'dirname': dirname,
+    'open-dialog': openDialog,
+    'read-file': readFile, 
 }
 
 function registerListeners() {

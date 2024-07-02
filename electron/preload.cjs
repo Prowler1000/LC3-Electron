@@ -21,6 +21,29 @@ async function saveData(
     ipcRenderer.invoke('write-file', filePath, data);
 }
 
+async function openAndRead() {
+    let returnValue = {
+        completed: false,
+        fileContent: "",
+        fileName: "",
+        filePath: "",
+    }
+    let results = await ipcRenderer.invoke('open-dialog');
+    if (!results.canceled) {
+        // Since we're doing an IO operation, may as well let the path jobs do their thing 
+        // while we wait
+        let fullpath = results.filePaths[0];
+        let readTask = ipcRenderer.invoke('read-file', fullpath).then(d => returnValue.fileContent = d);
+        let nameTask = basename(fullpath).then(n => returnValue.fileName = n);
+        let pathTask = dirname(fullpath).then(p => returnValue.filePath = p);
+        await readTask;
+        await nameTask;
+        await pathTask
+        returnValue.completed = true
+    }
+    return returnValue;
+}
+
 /**
  * @param {string} fullpath
  */
@@ -49,6 +72,7 @@ const api = {
     dialogs: {
         saveAs: saveAs,
         save: saveData,
+        open: openAndRead,
     },
     path: {
         join: pathJoin,
