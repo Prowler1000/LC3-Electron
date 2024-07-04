@@ -24,6 +24,7 @@ export class EditManager {
 
   public async InitMonacoEditor() {
     this.monacoEditor = await InitMonaco();
+    this.onSave(); // We just initialized the editor, its default content is technically saved
 
     this.monacoEditor.getModel()?.onDidChangeContent(() => {this.onContentChange()});
     this.monacoEditor.addCommand(KeyMod.CtrlCmd | KeyCode.KeyS, () => this.save());
@@ -65,6 +66,7 @@ export class EditManager {
       this.monacoEditor.setValue("");
       this.filename.set("untitled.asm");
       this.filepath.set("");
+      this.onSave(); // The editor is blank, the content is technically saved
     }
   }
 

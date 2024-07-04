@@ -6,7 +6,7 @@ async function saveAs(
     /** @type {() => {}} */ callback
 ) {
     let result = await ipcRenderer.invoke('save-dialog', defaultPath, data);
-    if (!result.cancelled) {
+    if (!result.canceled) {
         await saveData(result.filePath, data, callback);
     }
     return result;
