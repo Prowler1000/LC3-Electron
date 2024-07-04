@@ -66,10 +66,19 @@
             reloadOverride.set([true,false])
         }
     }
+
+    function closeDialog(e: MouseEvent & { currentTarget: EventTarget & HTMLDialogElement; }) {
+        if (e.target === e.currentTarget) {
+            (e.target as HTMLDialogElement).close();
+        }
+    }
 </script>
 
 <div id="menu" class="workSans" role="menubar" aria-label="Editor and simulator work controls">
-    <dialog>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+    <!-- Consider whether we can change this to be more accessible -->
+    <dialog class="unsaved-dialog" on:click={closeDialog}>
         <p>You have unsaved changes. Would you like to save them now?</p>
         <form method="dialog">
             <button>Cancel</button>
@@ -139,6 +148,59 @@
         letter-spacing: 1px;
         font-size: 9px;
         margin: 0;
+    }
+
+    .unsaved-dialog {
+        width: 300px;
+        padding: 20px;
+        background-color: rgb(206, 206, 206);
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        z-index: 9999;
+    }
+
+    .unsaved-dialog p {
+        margin: 0;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .unsaved-dialog form {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .unsaved-dialog button {
+        margin: 0 10px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .unsaved-dialog button:hover {
+        filter: brightness(75%);
+    }
+
+    .unsaved-dialog button:first-child {
+        background-color: #686767;
+        color: black;
+    }
+
+    .unsaved-dialog button:nth-child(2) {
+        background-color: #f44336;
+        color: black;
+    }
+
+    .unsaved-dialog button:nth-child(3) {
+        background-color: #4caf50;
+        color: black;
+    }
+    .unsaved-dialog::backdrop {
+        backdrop-filter: blur(2px);
     }
 
     @media (max-width: 1200px) {
