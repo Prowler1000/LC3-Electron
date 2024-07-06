@@ -19,11 +19,16 @@
 	const ARM_EXTENSION = "s"
 
 	export let editor: EditManager;
+	// Current .asm program filename
+	export let filename = "untitled.asm"
 
 	let appLoadComplete = false
 	onMount(() => {
-		let filename = document.getElementById("filename")
-		if (filename) filename.style.visibility = "visible"
+		editor.filename.subscribe((value) => {
+			filename = value;
+			(document.getElementById("filename") as HTMLTextAreaElement).value = value;
+
+		});
 		appLoadComplete = true
 	});
 
@@ -32,96 +37,8 @@
 
 	// Switch the simulator view on button click
 	function toSimulator() { currentView.set("simulator") }
-	// Current .asm program filename
-	export let filename = "untitled.asm"
-	editor.filename.subscribe(value => { filename = value });
-	// Text to show on filename component
-	$: showText = filename
 	// Stifle other functions from firing if input is open
 	let inputOpen = false
-
-	// Change text on hover to cue that filename can be set
-	function showRename(){
-		if(!inputOpen)
-			showText = "Rename workspace"
-	}
-
-	// Swap back text to .asm filename
-	function showFilename(){
-		if(!inputOpen)
-			showText = filename
-	}
-
-	// Set new filename
-	function setFilename(this: HTMLElement){
-		if(!inputOpen){
-			showText = ""
-			let newInput = createInputBox()
-			this.appendChild(newInput)
-			newInput.focus()
-			inputOpen = true
-		}
-	}
-
-	// Create text input box for entering new filename
-	function createInputBox(){
-		let newInput = document.createElement("input")
-		newInput.style.border = "none"
-		newInput.style.outline = "none"
-		newInput.style.background = "none"
-		newInput.style.borderBottom = "1px solid #5B5B5B"
-		newInput.value = filename
-		newInput.ariaLabel = "Enter new filename"
-
-		// Close input box
-		newInput.addEventListener("blur", function leave(e) {
-			showText = filename
-			inputOpen = false
-			try {
-				let target = (e.target as HTMLInputElement)
-				let parent = target.parentElement
-				saveInput(target.value)
-				parent?.removeChild(target)
-				setTimeout(function() { parent?.focus() }, 100);
-			} catch {}
-		})
-		newInput.addEventListener("keydown", function leave(e) {
-			if(e.key == "Enter"){
-				showText = filename
-				inputOpen = false
-				try {
-					let target = (e.target as HTMLInputElement)
-					let parent = target.parentElement
-					saveInput(target.value)
-					parent?.removeChild(target)
-				} catch {}
-			}
-			e.stopImmediatePropagation()
-		})
-
-		// Commit new filename if validations pass. Else, rollback (old value will not change)
-		function saveInput(newValue: string){
-			if(newValue.length > 0){
-				newValue = newValue.replaceAll(" ","_")
-				// Make filename utf-8 encoding-friendly
-				newValue = encodeURIComponent(newValue)
-				.replace(/['()*]/g, (c) => `%${c.charCodeAt(0).toString(16)}`)
-				.replace(/%(7C|60|5E)/g, (str, hex) =>
-					String.fromCharCode(parseInt(hex, 16))
-				)
-				/*
-				Let the user specify .asm (LC-3) or .s (ARM), and fall back to LC-3 if the user enters an invalid
-				extension
-				*/
-				if (!newValue.endsWith(".asm") && !newValue.endsWith('.s'))
-					newValue += ".asm"
-
-				editor.filename.set(newValue)
-			}
-		}
-
-		return newInput // Complete text input element
-	}
 
 	// Set filename of assembled .obj file, replacing .asm extension
 	function setObjFilename(){
@@ -185,6 +102,32 @@
 			}
 		}
 	}
+
+	function filenameOnInput(event: Event & { currentTarget: EventTarget & HTMLTextAreaElement; }) {
+		event.currentTarget.value = event.currentTarget.value.replace(/\n/g, '');
+	}
+
+	function filenameOnBlur(event: Event & { currentTarget: EventTarget & HTMLTextAreaElement; }) {
+		let value = event.currentTarget.value
+		if (value.length === 0) {
+			value = "untitled.asm";
+		}
+		else if (!value.endsWith(".asm") && !value.endsWith(".s")) {
+			value += ".asm";
+		}
+		if (value === filename) {
+			// Subscribe functions won't be called, we need to set things here
+			event.currentTarget.value = value;
+		}
+		editor.filename.set(value);
+	}
+
+	function filenameKeydown(e: KeyboardEvent & { currentTarget: EventTarget & HTMLTextAreaElement; }) {
+		if (e.key === "Enter") {
+			e.currentTarget.blur();
+		}
+	}
+
 </script>
 
 <div id="editor-view" role="group" aria-label="Editor workspace">
@@ -209,9 +152,11 @@
 	</section>
 	{/if}
 	<section id="ev-left">
-		<div id="filename" class="workSans" on:mouseenter={showRename} on:mouseleave={showFilename} on:click={setFilename} on:keypress={setFilename} role="button" aria-label="Click to rename workspace file" tabindex="0">
-			{showText}
-		</div>
+		<textarea id="filename" class="workSans" rows="1"
+			on:input={filenameOnInput}
+			on:keydown={filenameKeydown}
+			on:blur={filenameOnBlur}
+		></textarea>
 		<Editor {editor} />
 	</section>
 </div>
@@ -226,13 +171,15 @@
 	}
 
 	#filename{
-		font-size: 15px;
-		width: max-content;
-		min-width: 50%;
-		margin-bottom: 2vh;
+		width: auto;
+		border: none;
+		border-radius: 4px;
+		padding: 10px;
+		resize: none;
+		overflow: hidden;
 		text-align: center;
-		cursor: pointer;
-		visibility: hidden;
+		font-size: 15px;
+		background: none;
 	}
 
 	.filler{
